@@ -1,11 +1,34 @@
 # AWSコストSlack通知ボット
+定期的にAWSのコストをSlackへ通知してくれる便利なやつ．
+デフォルトでは毎週月曜日の10時にこんな感じでコストを投稿してくれる．
+
+> Period: 2023-08-01 ~ 2023-08-29
+> ```
+> +------------------------------------+----------+
+> | Service                            |   Amount |
+> +------------------------------------+----------+
+> | AWS Lambda                         | 0.00 USD |
+> | EC2 - Other                        | 5.84 USD |
+> | Amazon Relational Database Service | 0.05 USD |
+> | Amazon Route 53                    | 1.50 USD |
+> | Amazon Simple Storage Service      | 0.03 USD |
+> | Amazon Virtual Private Cloud       | 0.00 USD |
+> | AmazonCloudWatch                   | 0.00 USD |
+> | Tax                                | 0.74 USD |
+> | ---------------------------------- | -------- |
+> | Total                              | 8.15 USD |
+> +------------------------------------+----------+
+> ```
 
 ## TL; DR
-Terraformを使えるようにして，以下の環境変数をセット．
-- AWS_ACCESS_KEY_ID: アクセスキー
-- AWS_SECRET_ACCESS_KEY: シークレットキー
-- AWS_REGION: リージョン
-- TF_VAR_SLACK_WEBHOOK_URL: 通知先のSlackチャンネルへのWebhook URL
+- Terraform CLIを使えるようにする
+- AWSのCost Explorerを有効化
+- 通知したいSlackチャンネルへのWebhook URLを作成
+- 以下の環境変数をセット
+  - AWS_ACCESS_KEY_ID: アクセスキー
+  - AWS_SECRET_ACCESS_KEY: シークレットキー
+  - AWS_REGION: リージョン
+  - TF_VAR_SLACK_WEBHOOK_URL: 通知先のSlackチャンネルへのWebhook URL
 
 そしたら
 ```
