@@ -4,7 +4,7 @@ variable "SLACK_WEBHOOK_URL" {
 
 variable "SCHEDULE_EXPRESSION" {
     type = string
-    default = "cron(0 10 ? * MON *)"
+    default = "cron(0 1 ? * MON *)"
 }
 
 provider aws {}
