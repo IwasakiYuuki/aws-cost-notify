@@ -76,20 +76,35 @@ resource "aws_lambda_function" "cn_lambda" {
   }
 }
 
-resource "aws_cloudwatch_event_rule" "every_week" {
-  name                = "every_week"
-  schedule_expression = var.SCHEDULE_EXPRESSION
+variable "SCHEDULE_EXPRESSIONS" {
+  description = "Cron expressions for scheduling, separated by a comma"
+  type        = string
+  default     = "cron(0 18 ? * MON-FRI *)"
 }
 
-resource "aws_cloudwatch_event_target" "example" {
-  rule      = aws_cloudwatch_event_rule.every_week.name
-  arn       = aws_lambda_function.cn_lambda.arn
+locals {
+  schedule_expressions = split(",", var.SCHEDULE_EXPRESSIONS)
+}
+
+resource "aws_cloudwatch_event_rule" "cn_rule" {
+  count               = length(local.schedule_expressions)
+  name                = "cn_rule_${count.index}"
+  schedule_expression = local.schedule_expressions[count.index]
+}
+
+resource "aws_cloudwatch_event_target" "cn_target" {
+  count = length(local.schedule_expressions)
+
+  rule = aws_cloudwatch_event_rule.cn_rule[count.index].name
+  arn  = aws_lambda_function.cn_lambda.arn
 }
 
 resource "aws_lambda_permission" "allow_cloudwatch" {
-  statement_id  = "AllowExecutionFromCloudWatch"
+  count = length(local.schedule_expressions)
+
+  statement_id  = "AllowExecutionFromCloudWatch${count.index}"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.cn_lambda.function_name
   principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.every_week.arn
+  source_arn    = aws_cloudwatch_event_rule.cn_rule[count.index].arn
 }

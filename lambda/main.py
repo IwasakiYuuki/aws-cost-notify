@@ -18,13 +18,18 @@ def lambda_handler(event, context):
     amount_sum = 0
     unit = None
     max_width = 7
+    services_data = []
     for group in response['ResultsByTime'][0]['Groups']:
         service = group['Keys'][0]
-        if len(service) > max_width:
-            max_width = len(service)
         amount = float(group['Metrics']['UnblendedCost']['Amount'])
         unit = group['Metrics']['UnblendedCost']['Unit']
         amount_sum += amount
+        services_data.append((service, amount, unit))
+        if len(service) > max_width:
+            max_width = len(service)
+    services_data.sort(key=lambda x: x[1], reverse=True)
+    top_services = services_data[:8]
+    for service, amount, unit in top_services:
         x.add_row([service, "{:.2f} {}".format(amount, unit)])
 
     amount_sum_str = "{:.2f} {}".format(amount_sum, unit)
@@ -38,7 +43,6 @@ def lambda_handler(event, context):
 
     return {
         'statusCode': 200,
-        'body': json.dumps(table_str)
     }
 
 
